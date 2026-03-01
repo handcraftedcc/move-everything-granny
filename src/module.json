@@ -81,7 +81,7 @@
     },
     "chain_params": [
       { "key": "position", "name": "Position", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01, "default": 0.5 },
-      { "key": "scan", "name": "Scan", "type": "float", "min": -1.0, "max": 1.0, "step": 0.001, "default": 0.0 },
+      { "key": "scan", "name": "Scan", "type": "float", "min": -10.0, "max": 10.0, "step": 0.01, "default": 0.0 },
       { "key": "size_ms", "name": "Size", "type": "float", "min": 5.0, "max": 500.0, "step": 0.5, "default": 60.0 },
       { "key": "density", "name": "Density", "type": "float", "min": 1.0, "max": 60.0, "step": 0.5, "default": 18.0 },
       { "key": "spray", "name": "Spray", "type": "float", "min": 0.0, "max": 1.0, "step": 0.001, "default": 0.15 },

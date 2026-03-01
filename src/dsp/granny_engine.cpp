@@ -213,7 +213,7 @@ void grn_engine_set_params(grn_engine_t *engine, const grn_params_t *params) {
     grn_params_t p = *params;
 
     p.position = clampf(p.position, 0.0f, 1.0f);
-    p.scan = clampf(p.scan, -1.0f, 1.0f);
+    p.scan = clampf(p.scan, -10.0f, 10.0f);
     p.size_ms = clampf(p.size_ms, 5.0f, 500.0f);
     p.density = clampf(p.density, 1.0f, 60.0f);
     p.spray = clampf(p.spray, 0.0f, 1.0f);
@@ -450,7 +450,7 @@ static void spawn_grain(grn_engine_t *engine,
 static void advance_voice_scan(grn_engine_t *engine, grn_voice_t *voice, int frames) {
     if (!voice->active || !voice->gate || voice->scan_stopped) return;
 
-    float scan_rate = engine->params.freeze ? 0.0f : engine->sm_scan;
+    float scan_rate = engine->params.freeze ? 0.0f : (engine->sm_scan * 0.1f);
     if (fabsf(scan_rate) < 0.000001f) return;
 
     float delta = scan_rate * (float)frames / (float)engine->sample_rate;

@@ -99,7 +99,7 @@ typedef struct {
 
 static const param_meta_t g_params[] = {
     {"position", "Position", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, position)},
-    {"scan", "Scan", PARAM_FLOAT, -1.0f, 1.0f, offsetof(grn_params_t, scan)},
+    {"scan", "Scan", PARAM_FLOAT, -10.0f, 10.0f, offsetof(grn_params_t, scan)},
     {"size_ms", "Size", PARAM_FLOAT, 5.0f, 500.0f, offsetof(grn_params_t, size_ms)},
     {"density", "Density", PARAM_FLOAT, 1.0f, 60.0f, offsetof(grn_params_t, density)},
     {"spray", "Spray", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, spray)},
@@ -915,7 +915,7 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
                                    g_params[i].max_val);
             } else if (strcmp(g_params[i].key, "scan") == 0) {
                 offset += snprintf(buf + offset, buf_len - offset,
-                                   "{\"key\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"min\":%g,\"max\":%g,\"step\":0.001}",
+                                   "{\"key\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"min\":%g,\"max\":%g,\"step\":0.01}",
                                    g_params[i].key,
                                    g_params[i].name,
                                    g_params[i].type == PARAM_FLOAT ? "float" : "int",
