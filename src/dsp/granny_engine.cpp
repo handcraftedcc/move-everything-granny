@@ -60,9 +60,15 @@ static inline float semitone_ratio(const grn_engine_t *engine, float semitones) 
 static inline float window_sample(const grn_engine_t *engine, int window_type, float t, float shape) {
     if (t <= 0.0f || t >= 1.0f) return 0.0f;
 
+    /* Endpoint-preserving shape warp:
+     * - keeps t=0 and t=1 fixed (window stays zero at grain edges)
+     * - strongest around the middle, fades out near edges
+     * This avoids shape-induced tail lift that can sound clicky. */
+    float s = clampf(shape, 0.0f, 1.0f);
     float centered = t - 0.5f;
-    float scale = 1.0f - 0.85f * clampf(shape, 0.0f, 1.0f);
-    float warped = 0.5f + centered * scale;
+    float mid = 4.0f * t * (1.0f - t);   /* 0 at edges, 1 at center */
+    float pull = mid * mid;              /* sharper edge falloff */
+    float warped = t - centered * s * pull;
     warped = clampf(warped, 0.0f, 1.0f);
 
     if (window_type == 1) {
