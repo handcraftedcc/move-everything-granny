@@ -127,6 +127,36 @@ static const char *kQualityOptions[] = {"eco", "normal", "high"};
 static const char *kTriggerOptions[] = {"per_voice", "global_cloud"};
 static const char *kScanEndOptions[] = {"wrap", "pingpong", "clamp", "stop"};
 static const char *kPlayModeOptions[] = {"mono", "portamento", "poly"};
+static const char *kOnOffOptions[] = {"off", "on"};
+
+static const char *enum_value_to_string(const char *key, int value) {
+    if (!key) return NULL;
+    if (strcmp(key, "window_type") == 0) {
+        if (value >= 0 && value < 3) return kWindowOptions[value];
+        return NULL;
+    }
+    if (strcmp(key, "quality") == 0) {
+        if (value >= 0 && value < 3) return kQualityOptions[value];
+        return NULL;
+    }
+    if (strcmp(key, "trigger_mode") == 0) {
+        if (value >= 0 && value < 2) return kTriggerOptions[value];
+        return NULL;
+    }
+    if (strcmp(key, "scan_end_mode") == 0) {
+        if (value >= 0 && value < 4) return kScanEndOptions[value];
+        return NULL;
+    }
+    if (strcmp(key, "play_mode") == 0) {
+        if (value >= 0 && value < 3) return kPlayModeOptions[value];
+        return NULL;
+    }
+    if (strcmp(key, "freeze") == 0) {
+        if (value >= 0 && value < 2) return kOnOffOptions[value];
+        return NULL;
+    }
+    return NULL;
+}
 
 static int parse_enum_value(const char *key, const char *val, int *out) {
     if (!key || !val || !out) return 0;
@@ -848,7 +878,11 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
         for (int i = 0; i < PARAM_COUNT; i++) {
             float v = get_numeric_param(&inst->params, &g_params[i]);
             if (i > 0) offset += snprintf(buf + offset, buf_len - offset, ",");
-            if (g_params[i].type == PARAM_FLOAT) {
+            const char *enum_name = enum_value_to_string(g_params[i].key, (int)lroundf(v));
+            if (enum_name) {
+                offset += snprintf(buf + offset, buf_len - offset,
+                                   "\"%s\":\"%s\"", g_params[i].key, enum_name);
+            } else if (g_params[i].type == PARAM_FLOAT) {
                 offset += snprintf(buf + offset, buf_len - offset,
                                    "\"%s\":%.4f", g_params[i].key, v);
             } else {
@@ -892,6 +926,9 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
                                    g_params[i].type == PARAM_FLOAT ? "float" : "int",
                                    g_params[i].min_val,
                                    g_params[i].max_val);
+            } else if (strcmp(g_params[i].key, "freeze") == 0) {
+                offset += snprintf(buf + offset, buf_len - offset,
+                                   "{\"key\":\"freeze\",\"name\":\"Freeze\",\"type\":\"enum\",\"options\":[\"off\",\"on\"]}");
             } else if (strcmp(g_params[i].key, "portamento_ms") == 0) {
                 offset += snprintf(buf + offset, buf_len - offset,
                                    "{\"key\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"min\":%g,\"max\":%g,\"step\":1}",
@@ -964,6 +1001,10 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
     const param_meta_t *meta = find_param(key);
     if (meta) {
         float v = get_numeric_param(&inst->params, meta);
+        const char *enum_name = enum_value_to_string(meta->key, (int)lroundf(v));
+        if (enum_name) {
+            return snprintf(buf, buf_len, "%s", enum_name);
+        }
         if (meta->type == PARAM_FLOAT) {
             return snprintf(buf, buf_len, "%.4f", v);
         }
