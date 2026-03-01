@@ -208,7 +208,7 @@ void grn_engine_set_params(grn_engine_t *engine, const grn_params_t *params) {
 
     p.position = clampf(p.position, 0.0f, 1.0f);
     p.scan = clampf(p.scan, -1.0f, 1.0f);
-    p.size_ms = clampf(p.size_ms, 5.0f, 250.0f);
+    p.size_ms = clampf(p.size_ms, 5.0f, 500.0f);
     p.density = clampf(p.density, 1.0f, 60.0f);
     p.spray = clampf(p.spray, 0.0f, 1.0f);
     p.jitter = clampf(p.jitter, 0.0f, 1.0f);

@@ -100,7 +100,7 @@ typedef struct {
 static const param_meta_t g_params[] = {
     {"position", "Position", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, position)},
     {"scan", "Scan", PARAM_FLOAT, -1.0f, 1.0f, offsetof(grn_params_t, scan)},
-    {"size_ms", "Size", PARAM_FLOAT, 5.0f, 250.0f, offsetof(grn_params_t, size_ms)},
+    {"size_ms", "Size", PARAM_FLOAT, 5.0f, 500.0f, offsetof(grn_params_t, size_ms)},
     {"density", "Density", PARAM_FLOAT, 1.0f, 60.0f, offsetof(grn_params_t, density)},
     {"spray", "Spray", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, spray)},
     {"jitter", "Jitter", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, jitter)},
