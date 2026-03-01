@@ -400,6 +400,15 @@ static void spawn_grain(grn_engine_t *engine,
         offset = (int)(r * (float)max_offset);
     }
 
+    /* Jitter now adds broad position randomization.
+     * At 100% it can randomize across the full file length. */
+    float jitter = clampf(engine->sm_jitter, 0.0f, 1.0f);
+    int jitter_range = (int)(jitter * (float)(sample_len - 1));
+    if (jitter_range > 0) {
+        float jr = rand01(rng) * 2.0f - 1.0f;
+        offset += (int)(jr * (float)jitter_range);
+    }
+
     int start_idx = center + offset;
     int loop_len = sample_len - 1;
     while (start_idx < 0) start_idx += loop_len;
@@ -413,7 +422,6 @@ static void spawn_grain(grn_engine_t *engine,
     float inc = src_to_out * pitch_ratio;
     inc = clampf(inc, 0.01f, 8.0f);
 
-    float jitter = clampf(engine->sm_jitter, 0.0f, 1.0f);
     int start_delay = 0;
     if (jitter > 0.0f && frames > 1) {
         start_delay = (int)(rand01(rng) * jitter * (float)(frames - 1));

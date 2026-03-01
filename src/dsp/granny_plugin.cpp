@@ -926,6 +926,14 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
                                    g_params[i].type == PARAM_FLOAT ? "float" : "int",
                                    g_params[i].min_val,
                                    g_params[i].max_val);
+            } else if (strcmp(g_params[i].key, "spray") == 0 || strcmp(g_params[i].key, "jitter") == 0) {
+                offset += snprintf(buf + offset, buf_len - offset,
+                                   "{\"key\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"min\":%g,\"max\":%g,\"step\":0.005}",
+                                   g_params[i].key,
+                                   g_params[i].name,
+                                   g_params[i].type == PARAM_FLOAT ? "float" : "int",
+                                   g_params[i].min_val,
+                                   g_params[i].max_val);
             } else if (strcmp(g_params[i].key, "freeze") == 0) {
                 offset += snprintf(buf + offset, buf_len - offset,
                                    "{\"key\":\"freeze\",\"name\":\"Freeze\",\"type\":\"enum\",\"options\":[\"off\",\"on\"]}");
