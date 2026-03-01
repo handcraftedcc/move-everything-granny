@@ -99,11 +99,11 @@ typedef struct {
 
 static const param_meta_t g_params[] = {
     {"position", "Position", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, position)},
-    {"scan", "Scan", PARAM_FLOAT, -10.0f, 10.0f, offsetof(grn_params_t, scan)},
     {"size_ms", "Size", PARAM_FLOAT, 5.0f, 500.0f, offsetof(grn_params_t, size_ms)},
     {"density", "Density", PARAM_FLOAT, 1.0f, 60.0f, offsetof(grn_params_t, density)},
     {"spray", "Spray", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, spray)},
     {"jitter", "Jitter", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, jitter)},
+    {"scan", "Scan", PARAM_FLOAT, -10.0f, 10.0f, offsetof(grn_params_t, scan)},
     {"freeze", "Freeze", PARAM_BOOL, 0.0f, 1.0f, offsetof(grn_params_t, freeze)},
     {"pitch_semi", "Pitch", PARAM_INT, -24.0f, 24.0f, offsetof(grn_params_t, pitch_semi)},
     {"fine_cents", "Fine", PARAM_FLOAT, -100.0f, 100.0f, offsetof(grn_params_t, fine_cents)},
@@ -115,6 +115,7 @@ static const param_meta_t g_params[] = {
     {"play_mode", "Play Mode", PARAM_INT, 0.0f, 2.0f, offsetof(grn_params_t, play_mode)},
     {"portamento_ms", "Porta Time", PARAM_FLOAT, 0.0f, 2000.0f, offsetof(grn_params_t, portamento_ms)},
     {"trigger_mode", "Trigger", PARAM_INT, 0.0f, 1.0f, offsetof(grn_params_t, trigger_mode)},
+    {"scan_enable", "Scan Enable", PARAM_BOOL, 0.0f, 1.0f, offsetof(grn_params_t, scan_enable)},
     {"scan_end_mode", "Scan End", PARAM_INT, 0.0f, 3.0f, offsetof(grn_params_t, scan_end_mode)},
     {"spread", "Spread", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, spread)},
     {"quality", "Quality", PARAM_INT, 0.0f, 2.0f, offsetof(grn_params_t, quality)},
@@ -155,6 +156,10 @@ static const char *enum_value_to_string(const char *key, int value) {
         if (value >= 0 && value < 2) return kOnOffOptions[value];
         return NULL;
     }
+    if (strcmp(key, "scan_enable") == 0) {
+        if (value >= 0 && value < 2) return kOnOffOptions[value];
+        return NULL;
+    }
     return NULL;
 }
 
@@ -174,7 +179,7 @@ static int parse_enum_value(const char *key, const char *val, int *out) {
     if (strcmp(key, "window_type") == 0) {
         options = kWindowOptions;
         count = 3;
-    } else if (strcmp(key, "freeze") == 0) {
+    } else if (strcmp(key, "freeze") == 0 || strcmp(key, "scan_enable") == 0) {
         options = kOnOffOptions;
         count = 2;
     } else if (strcmp(key, "quality") == 0) {
@@ -665,6 +670,7 @@ static void init_default_params(grain_instance_t *inst) {
     inst->params.density = 18.0f;
     inst->params.spray = 0.15f;
     inst->params.jitter = 0.10f;
+    inst->params.scan_enable = 1;
     inst->params.freeze = 0;
     inst->params.pitch_semi = 0;
     inst->params.fine_cents = 0.0f;
@@ -948,6 +954,9 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
             } else if (strcmp(g_params[i].key, "freeze") == 0) {
                 offset += snprintf(buf + offset, buf_len - offset,
                                    "{\"key\":\"freeze\",\"name\":\"Freeze\",\"type\":\"enum\",\"options\":[\"off\",\"on\"]}");
+            } else if (strcmp(g_params[i].key, "scan_enable") == 0) {
+                offset += snprintf(buf + offset, buf_len - offset,
+                                   "{\"key\":\"scan_enable\",\"name\":\"Scan Enable\",\"type\":\"enum\",\"options\":[\"off\",\"on\"]}");
             } else if (strcmp(g_params[i].key, "portamento_ms") == 0) {
                 offset += snprintf(buf + offset, buf_len - offset,
                                    "{\"key\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"min\":%g,\"max\":%g,\"step\":1}",
@@ -1001,13 +1010,33 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
             "\"levels\":{"
                 "\"root\":{"
                     "\"name\":\"Granny\","
-                    "\"knobs\":[\"position\",\"scan\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"pitch_semi\",\"spread\"],"
+                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"scan\",\"freeze\",\"sample_index\"],"
                     "\"params\":["
-                        "\"position\",\"scan\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\","
-                        "\"pitch_semi\",\"fine_cents\",\"keytrack\","
-                        "\"window_type\",\"window_shape\",\"grain_gain\","
-                        "\"polyphony\",\"play_mode\",\"portamento_ms\",\"trigger_mode\",\"scan_end_mode\",\"spread\",\"quality\",\"sample_index\""
+                        "{\"label\":\"Main\",\"level\":\"main\"},"
+                        "{\"label\":\"Pitch / Voice\",\"level\":\"pitch_voice\"},"
+                        "{\"label\":\"Window / Tone\",\"level\":\"window_tone\"},"
+                        "{\"label\":\"Scan\",\"level\":\"scan_menu\"}"
                     "]"
+                "},"
+                "\"main\":{"
+                    "\"name\":\"Main\","
+                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\",\"sample_index\"],"
+                    "\"params\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\",\"sample_index\"]"
+                "},"
+                "\"pitch_voice\":{"
+                    "\"name\":\"Pitch / Voice\","
+                    "\"knobs\":[\"pitch_semi\",\"fine_cents\",\"keytrack\",\"play_mode\",\"polyphony\",\"portamento_ms\",\"spread\"],"
+                    "\"params\":[\"pitch_semi\",\"fine_cents\",\"keytrack\",\"play_mode\",\"polyphony\",\"portamento_ms\",\"spread\"]"
+                "},"
+                "\"window_tone\":{"
+                    "\"name\":\"Window / Tone\","
+                    "\"knobs\":[\"window_type\",\"window_shape\",\"grain_gain\",\"quality\",\"trigger_mode\"],"
+                    "\"params\":[\"window_type\",\"window_shape\",\"grain_gain\",\"quality\",\"trigger_mode\"]"
+                "},"
+                "\"scan_menu\":{"
+                    "\"name\":\"Scan\","
+                    "\"knobs\":[\"scan_enable\",\"scan\",\"scan_end_mode\"],"
+                    "\"params\":[\"scan_enable\",\"scan\",\"scan_end_mode\"]"
                 "}"
             "}"
         "}";

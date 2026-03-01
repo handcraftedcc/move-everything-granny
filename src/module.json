@@ -11,6 +11,7 @@
   "defaults": {
     "position": 0.5,
     "scan": 0.0,
+    "scan_enable": "on",
     "size_ms": 60,
     "density": 18,
     "spray": 0.15,
@@ -45,48 +46,104 @@
           "name": "Granny",
           "knobs": [
             "position",
-            "scan",
             "size_ms",
             "density",
             "spray",
             "jitter",
-            "pitch_semi",
-            "spread"
+            "scan",
+            "freeze",
+            "sample_index"
           ],
           "params": [
+            { "label": "Main", "level": "main" },
+            { "label": "Pitch / Voice", "level": "pitch_voice" },
+            { "label": "Window / Tone", "level": "window_tone" },
+            { "label": "Scan", "level": "scan_menu" }
+          ]
+        },
+        "main": {
+          "name": "Main",
+          "knobs": [
             "position",
-            "scan",
             "size_ms",
             "density",
             "spray",
             "jitter",
             "freeze",
+            "sample_index"
+          ],
+          "params": [
+            "position",
+            "size_ms",
+            "density",
+            "spray",
+            "jitter",
+            "freeze",
+            "sample_index"
+          ]
+        },
+        "pitch_voice": {
+          "name": "Pitch / Voice",
+          "knobs": [
             "pitch_semi",
             "fine_cents",
             "keytrack",
+            "play_mode",
+            "polyphony",
+            "portamento_ms",
+            "spread"
+          ],
+          "params": [
+            "pitch_semi",
+            "fine_cents",
+            "keytrack",
+            "play_mode",
+            "polyphony",
+            "portamento_ms",
+            "spread"
+          ]
+        },
+        "window_tone": {
+          "name": "Window / Tone",
+          "knobs": [
             "window_type",
             "window_shape",
             "grain_gain",
-            "polyphony",
-            "play_mode",
-            "portamento_ms",
-            "trigger_mode",
-            "scan_end_mode",
-            "spread",
             "quality",
-            "sample_index"
+            "trigger_mode"
+          ],
+          "params": [
+            "window_type",
+            "window_shape",
+            "grain_gain",
+            "quality",
+            "trigger_mode"
+          ]
+        },
+        "scan_menu": {
+          "name": "Scan",
+          "knobs": [
+            "scan_enable",
+            "scan",
+            "scan_end_mode"
+          ],
+          "params": [
+            "scan_enable",
+            "scan",
+            "scan_end_mode"
           ]
         }
       }
     },
     "chain_params": [
       { "key": "position", "name": "Position", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01, "default": 0.5 },
-      { "key": "scan", "name": "Scan", "type": "float", "min": -10.0, "max": 10.0, "step": 0.01, "default": 0.0 },
       { "key": "size_ms", "name": "Size", "type": "float", "min": 5.0, "max": 500.0, "step": 0.5, "default": 60.0 },
       { "key": "density", "name": "Density", "type": "float", "min": 1.0, "max": 60.0, "step": 0.5, "default": 18.0 },
       { "key": "spray", "name": "Spray", "type": "float", "min": 0.0, "max": 1.0, "step": 0.001, "default": 0.15 },
       { "key": "jitter", "name": "Jitter", "type": "float", "min": 0.0, "max": 1.0, "step": 0.001, "default": 0.1 },
+      { "key": "scan", "name": "Scan", "type": "float", "min": -10.0, "max": 10.0, "step": 0.01, "default": 0.0 },
       { "key": "freeze", "name": "Freeze", "type": "enum", "options": ["off", "on"], "default": "off" },
+      { "key": "sample_index", "name": "Sample", "type": "int", "min": 0, "max_param": "sample_count", "step": 1, "default": 0 },
       { "key": "pitch_semi", "name": "Pitch", "type": "int", "min": -24, "max": 24, "step": 1, "default": 0 },
       { "key": "fine_cents", "name": "Fine", "type": "float", "min": -100.0, "max": 100.0, "step": 1.0, "default": 0.0 },
       { "key": "keytrack", "name": "KeyTrack", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01, "default": 1.0 },
@@ -97,10 +154,10 @@
       { "key": "play_mode", "name": "Play Mode", "type": "enum", "options": ["mono", "portamento", "poly"], "default": "mono" },
       { "key": "portamento_ms", "name": "Porta Time", "type": "int", "min": 0, "max": 2000, "step": 1, "default": 120 },
       { "key": "trigger_mode", "name": "Trigger", "type": "enum", "options": ["per_voice", "global_cloud"], "default": "per_voice" },
+      { "key": "scan_enable", "name": "Scan Enable", "type": "enum", "options": ["off", "on"], "default": "on" },
       { "key": "scan_end_mode", "name": "Scan End", "type": "enum", "options": ["wrap", "pingpong", "clamp", "stop"], "default": "wrap" },
       { "key": "spread", "name": "Spread", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01, "default": 0.2 },
-      { "key": "quality", "name": "Quality", "type": "enum", "options": ["eco", "normal", "high"], "default": "normal" },
-      { "key": "sample_index", "name": "Sample", "type": "int", "min": 0, "max_param": "sample_count", "step": 1, "default": 0 }
+      { "key": "quality", "name": "Quality", "type": "enum", "options": ["eco", "normal", "high"], "default": "normal" }
     ]
   }
 }

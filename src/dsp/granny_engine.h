@@ -66,6 +66,7 @@ typedef struct {
 typedef struct {
     float position;
     float scan;
+    int scan_enable;
     float size_ms;
     float density;
     float spray;

@@ -147,6 +147,9 @@ static inline float reflect01(float x) {
 
 static inline float voice_emission_position(const grn_engine_t *engine, const grn_voice_t *voice) {
     float base = emission_base_position(engine);
+    if (!engine->params.scan_enable) {
+        return clampf(base, 0.0f, 1.0f);
+    }
     float p = base + voice->scan_offset;
 
     if (engine->params.scan_end_mode == GRN_SCAN_WRAP) {
@@ -177,6 +180,7 @@ void grn_engine_init(grn_engine_t *engine) {
     grn_params_t defaults;
     defaults.position = 0.5f;
     defaults.scan = 0.0f;
+    defaults.scan_enable = 1;
     defaults.size_ms = 60.0f;
     defaults.density = 18.0f;
     defaults.spray = 0.15f;
@@ -214,6 +218,7 @@ void grn_engine_set_params(grn_engine_t *engine, const grn_params_t *params) {
 
     p.position = clampf(p.position, 0.0f, 1.0f);
     p.scan = clampf(p.scan, -10.0f, 10.0f);
+    p.scan_enable = p.scan_enable ? 1 : 0;
     p.size_ms = clampf(p.size_ms, 5.0f, 500.0f);
     p.density = clampf(p.density, 1.0f, 60.0f);
     p.spray = clampf(p.spray, 0.0f, 1.0f);
@@ -245,6 +250,7 @@ void grn_engine_set_params(grn_engine_t *engine, const grn_params_t *params) {
 
     int prev_polyphony = engine->params.polyphony;
     int prev_freeze = engine->params.freeze;
+    int prev_scan_enable = engine->params.scan_enable;
     engine->params = p;
 
     if (!prev_freeze && p.freeze) {
@@ -253,6 +259,13 @@ void grn_engine_set_params(grn_engine_t *engine, const grn_params_t *params) {
         engine->freeze_prev = 1;
     } else if (prev_freeze && !p.freeze) {
         engine->freeze_prev = 0;
+    }
+
+    if (prev_scan_enable && !p.scan_enable) {
+        for (int i = 0; i < GRN_MAX_VOICES; i++) {
+            engine->voices[i].scan_offset = 0.0f;
+            engine->voices[i].scan_stopped = 0;
+        }
     }
 
     if (p.polyphony < prev_polyphony) {
@@ -449,6 +462,7 @@ static void spawn_grain(grn_engine_t *engine,
 
 static void advance_voice_scan(grn_engine_t *engine, grn_voice_t *voice, int frames) {
     if (!voice->active || !voice->gate || voice->scan_stopped) return;
+    if (!engine->params.scan_enable) return;
 
     float scan_rate = engine->params.freeze ? 0.0f : (engine->sm_scan * 0.1f);
     if (fabsf(scan_rate) < 0.000001f) return;
