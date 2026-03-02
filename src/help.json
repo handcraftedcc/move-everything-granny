@@ -45,7 +45,7 @@
             "Density: grains/sec",
             "Spray: pos spread",
             "Jitter: time random",
-            "Freeze: lock motion"
+            "Grain Gain: level"
           ]
         },
         {

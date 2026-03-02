@@ -122,9 +122,6 @@ static int find_free_voice(const grn_engine_t *engine, int polyphony) {
 }
 
 static inline float emission_base_position(const grn_engine_t *engine) {
-    if (engine->params.freeze) {
-        return clampf(engine->frozen_position, 0.0f, 1.0f);
-    }
     return clampf(engine->sm_position, 0.0f, 1.0f);
 }
 
@@ -178,13 +175,13 @@ void grn_engine_init(grn_engine_t *engine) {
     }
 
     grn_params_t defaults;
-    defaults.position = 0.5f;
+    defaults.position = 0.2f;
     defaults.scan = 0.0f;
     defaults.scan_enable = 1;
-    defaults.size_ms = 60.0f;
-    defaults.density = 18.0f;
-    defaults.spray = 0.15f;
-    defaults.jitter = 0.10f;
+    defaults.size_ms = 100.0f;
+    defaults.density = 40.0f;
+    defaults.spray = 0.05f;
+    defaults.jitter = 0.50f;
     defaults.freeze = 0;
     defaults.pitch_semi = 0;
     defaults.fine_cents = 0.0f;
@@ -223,7 +220,7 @@ void grn_engine_set_params(grn_engine_t *engine, const grn_params_t *params) {
     p.density = clampf(p.density, 1.0f, 60.0f);
     p.spray = clampf(p.spray, 0.0f, 1.0f);
     p.jitter = clampf(p.jitter, 0.0f, 1.0f);
-    p.freeze = p.freeze ? 1 : 0;
+    p.freeze = 0;
     p.pitch_semi = clampi(p.pitch_semi, -24, 24);
     p.fine_cents = clampf(p.fine_cents, -100.0f, 100.0f);
     p.keytrack = clampf(p.keytrack, 0.0f, 1.0f);
@@ -249,17 +246,8 @@ void grn_engine_set_params(grn_engine_t *engine, const grn_params_t *params) {
     }
 
     int prev_polyphony = engine->params.polyphony;
-    int prev_freeze = engine->params.freeze;
     int prev_scan_enable = engine->params.scan_enable;
     engine->params = p;
-
-    if (!prev_freeze && p.freeze) {
-        engine->frozen_position = p.position;
-        engine->freeze_rng_state = engine->rng_state;
-        engine->freeze_prev = 1;
-    } else if (prev_freeze && !p.freeze) {
-        engine->freeze_prev = 0;
-    }
 
     if (prev_scan_enable && !p.scan_enable) {
         for (int i = 0; i < GRN_MAX_VOICES; i++) {
@@ -402,7 +390,7 @@ static void spawn_grain(grn_engine_t *engine,
     }
     if (slot < 0) return;
 
-    uint32_t *rng = engine->params.freeze ? &engine->freeze_rng_state : &engine->rng_state;
+    uint32_t *rng = &engine->rng_state;
 
     int size_samples = (int)(engine->sm_size_ms * 0.001f * (float)engine->sample_rate);
     size_samples = clampi(size_samples, 16, engine->sample_rate / 2);
@@ -464,7 +452,7 @@ static void advance_voice_scan(grn_engine_t *engine, grn_voice_t *voice, int fra
     if (!voice->active || !voice->gate || voice->scan_stopped) return;
     if (!engine->params.scan_enable) return;
 
-    float scan_rate = engine->params.freeze ? 0.0f : (engine->sm_scan * 0.1f);
+    float scan_rate = engine->sm_scan * 0.1f;
     if (fabsf(scan_rate) < 0.000001f) return;
 
     float delta = scan_rate * (float)frames / (float)engine->sample_rate;

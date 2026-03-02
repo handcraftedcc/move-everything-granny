@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 extern "C" {
@@ -42,6 +43,23 @@ static int expect_param(plugin_api_v2_t *api, void *inst, const char *key, const
     return 0;
 }
 
+static int expect_float_approx(plugin_api_v2_t *api, void *inst, const char *key, float want, float eps) {
+    char got[64];
+    memset(got, 0, sizeof(got));
+    if (api->get_param(inst, key, got, (int)sizeof(got)) < 0) {
+        fprintf(stderr, "get_param(%s) failed\n", key);
+        return 1;
+    }
+    float gv = (float)atof(got);
+    float diff = gv - want;
+    if (diff < 0.0f) diff = -diff;
+    if (diff > eps) {
+        fprintf(stderr, "expected %s~=%g, got %s\n", key, want, got);
+        return 1;
+    }
+    return 0;
+}
+
 int main() {
     plugin_api_v2_t *api = move_plugin_init_v2(NULL);
     if (!api || !api->create_instance || !api->set_param || !api->get_param || !api->destroy_instance) {
@@ -56,6 +74,11 @@ int main() {
     }
 
     int rc = 0;
+    rc |= expect_float_approx(api, inst, "position", 0.2f, 0.0002f);
+    rc |= expect_float_approx(api, inst, "size_ms", 100.0f, 0.0002f);
+    rc |= expect_float_approx(api, inst, "density", 40.0f, 0.0002f);
+    rc |= expect_float_approx(api, inst, "spray", 0.05f, 0.0002f);
+    rc |= expect_float_approx(api, inst, "jitter", 0.5f, 0.0002f);
     rc |= expect_param(api, inst, "scan_enable", "on");
 
     api->set_param(inst, "scan_enable", "off");

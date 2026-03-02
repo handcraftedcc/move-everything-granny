@@ -24,7 +24,7 @@ Root pages:
 - `Pitch / Voice`
 
 Main root knobs:
-- `Position`, `Size`, `Density`, `Spray`, `Jitter`, `Scan`, `Freeze`, `Quality`
+- `Position`, `Size`, `Density`, `Spray`, `Jitter`, `Scan`, `Grain Gain`, `Quality`
 
 ## Parameter Overview
 
@@ -36,7 +36,7 @@ Main root knobs:
 - `density`: grains per second
 - `spray`: random position spread around `position`
 - `jitter`: random timing offset of grain starts
-- `freeze`: hold grain position behavior
+- `grain_gain`: grain level
 
 ### Scan
 

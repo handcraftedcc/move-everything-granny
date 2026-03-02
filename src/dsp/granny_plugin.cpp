@@ -104,7 +104,6 @@ static const param_meta_t g_params[] = {
     {"spray", "Spray", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, spray)},
     {"jitter", "Jitter", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, jitter)},
     {"scan", "Scan", PARAM_FLOAT, -10.0f, 10.0f, offsetof(grn_params_t, scan)},
-    {"freeze", "Freeze", PARAM_BOOL, 0.0f, 1.0f, offsetof(grn_params_t, freeze)},
     {"pitch_semi", "Pitch", PARAM_INT, -24.0f, 24.0f, offsetof(grn_params_t, pitch_semi)},
     {"fine_cents", "Fine", PARAM_FLOAT, -100.0f, 100.0f, offsetof(grn_params_t, fine_cents)},
     {"keytrack", "KeyTrack", PARAM_FLOAT, 0.0f, 1.0f, offsetof(grn_params_t, keytrack)},
@@ -152,10 +151,6 @@ static const char *enum_value_to_string(const char *key, int value) {
         if (value >= 0 && value < 3) return kPlayModeOptions[value];
         return NULL;
     }
-    if (strcmp(key, "freeze") == 0) {
-        if (value >= 0 && value < 2) return kOnOffOptions[value];
-        return NULL;
-    }
     if (strcmp(key, "scan_enable") == 0) {
         if (value >= 0 && value < 2) return kOnOffOptions[value];
         return NULL;
@@ -179,7 +174,7 @@ static int parse_enum_value(const char *key, const char *val, int *out) {
     if (strcmp(key, "window_type") == 0) {
         options = kWindowOptions;
         count = 3;
-    } else if (strcmp(key, "freeze") == 0 || strcmp(key, "scan_enable") == 0) {
+    } else if (strcmp(key, "scan_enable") == 0) {
         options = kOnOffOptions;
         count = 2;
     } else if (strcmp(key, "quality") == 0) {
@@ -735,12 +730,12 @@ static const param_meta_t *find_param(const char *key) {
 }
 
 static void init_default_params(grain_instance_t *inst) {
-    inst->params.position = 0.5f;
+    inst->params.position = 0.2f;
     inst->params.scan = 0.0f;
-    inst->params.size_ms = 60.0f;
-    inst->params.density = 18.0f;
-    inst->params.spray = 0.15f;
-    inst->params.jitter = 0.10f;
+    inst->params.size_ms = 100.0f;
+    inst->params.density = 40.0f;
+    inst->params.spray = 0.05f;
+    inst->params.jitter = 0.50f;
     inst->params.scan_enable = 1;
     inst->params.freeze = 0;
     inst->params.pitch_semi = 0;
@@ -1042,9 +1037,6 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
                                    g_params[i].type == PARAM_FLOAT ? "float" : "int",
                                    g_params[i].min_val,
                                    g_params[i].max_val);
-            } else if (strcmp(g_params[i].key, "freeze") == 0) {
-                offset += snprintf(buf + offset, buf_len - offset,
-                                   "{\"key\":\"freeze\",\"name\":\"Freeze\",\"type\":\"enum\",\"options\":[\"off\",\"on\"]}");
             } else if (strcmp(g_params[i].key, "scan_enable") == 0) {
                 offset += snprintf(buf + offset, buf_len - offset,
                                    "{\"key\":\"scan_enable\",\"name\":\"Scan Enable\",\"type\":\"enum\",\"options\":[\"off\",\"on\"]}");
@@ -1099,7 +1091,7 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
             "\"levels\":{"
                 "\"root\":{"
                     "\"name\":\"Granny\","
-                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"scan\",\"freeze\",\"quality\"],"
+                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"scan\",\"grain_gain\",\"quality\"],"
                     "\"params\":["
                         "{\"label\":\"Main\",\"level\":\"main\"},"
                         "{\"label\":\"Scan\",\"level\":\"scan_menu\"},"
@@ -1109,8 +1101,8 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
                 "},"
                 "\"main\":{"
                     "\"name\":\"Main\","
-                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\"],"
-                    "\"params\":[\"sample_path\",\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\"]"
+                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"grain_gain\"],"
+                    "\"params\":[\"sample_path\",\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"grain_gain\"]"
                 "},"
                 "\"pitch_voice\":{"
                     "\"name\":\"Pitch / Voice\","
