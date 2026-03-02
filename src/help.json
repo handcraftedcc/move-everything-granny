@@ -47,13 +47,15 @@
     {
       "title": "Main",
       "lines": [
-        "Position: base file",
-        " location (0..1)",
+        "Sample File: pick",
+        " .wav source file",
         "",
-        "Size: grain length",
-        "Density: grains/sec",
+        "Position: base",
+        " location in file",
+        "Size: grain ms",
+        "Density: grains/s",
         "Spray: pos spread",
-        "Jitter: time random",
+        "Jitter: time rand",
         "Grain Gain: level"
       ]
     },
@@ -63,31 +65,31 @@
         "Scan Enable:",
         " on/off",
         "",
-        "Scan:",
-        " speed + direction",
-        " while note is held",
+        "Scan: movement",
+        " while note held",
+        " (- back, + fwd)",
         "",
         "Scan End:",
-        " wrap / pingpong",
-        " clamp / stop"
+        " wrap/pingpong/",
+        " clamp/stop"
       ]
     },
     {
       "title": "Window / Tone",
       "lines": [
-        "Window:",
-        " hann / triangle /",
+        "Window: grain env",
+        " hann/triangle/",
         " blackman",
         "",
-        "Hann: smooth",
-        " default",
+        "Hann: balanced",
         "Triangle: sharper",
-        "Blackman: softest",
-        " highs",
+        "Blackman: soft",
+        " top end",
         "",
-        "Win Shape: curve",
-        "Quality: eco/",
-        " normal/high",
+        "Win Shape:",
+        " curve amount",
+        "Quality:",
+        " eco/normal/high",
         "Trigger:",
         " per voice/global"
       ]
@@ -97,15 +99,15 @@
       "lines": [
         "Pitch: semitones",
         "Fine: cents",
-        "KeyTrack: amount",
+        "KeyTrack: note",
+        " -> pitch amount",
         "",
         "Play Mode:",
-        " mono / porta /",
-        " poly",
+        " mono/porta/poly",
         "Poly Voices:",
-        " only in poly",
+        " poly mode only",
         "Porta Time:",
-        " only in porta",
+        " porta mode ms",
         "Spread: stereo"
       ]
     },

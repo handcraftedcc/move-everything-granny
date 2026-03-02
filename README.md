@@ -57,6 +57,30 @@ Top-level pages:
 Main quick knobs:
 - `Position`, `Size`, `Density`, `Spray`, `Jitter`, `Scan`, `Grain Gain`, `Quality`
 
+Parameter guide:
+
+- `Sample File`: Select the source `.wav` file.
+- `Position`: Base playback point in the file (0-100%).
+- `Size`: Grain length in milliseconds.
+- `Density`: Grains emitted per second.
+- `Spray`: Random position spread around `Position`.
+- `Jitter`: Random timing shift per grain.
+- `Grain Gain`: Per-grain output level.
+- `Scan Enable`: Enables or disables scan movement.
+- `Scan`: Continuous position movement while note is held (negative = backward, positive = forward).
+- `Scan End`: Behavior when scan reaches file edges (`wrap`, `pingpong`, `clamp`, `stop`).
+- `Window`: Grain envelope shape (`hann`, `triangle`, `blackman`).
+- `Win Shape`: Adjusts the active window shape response.
+- `Quality`: Processing quality (`eco`, `normal`, `high`).
+- `Trigger`: Grain trigger mode (`per_voice`, `global_cloud`).
+- `Pitch`: Coarse transpose in semitones.
+- `Fine`: Fine pitch in cents.
+- `KeyTrack`: How much note pitch affects playback pitch.
+- `Play Mode`: Voice behavior (`mono`, `portamento`, `poly`).
+- `Poly Voices`: Max simultaneous voices in `poly` mode.
+- `Porta Time`: Glide time in `portamento` mode (ms).
+- `Spread`: Stereo width between voices.
+
 ## Default Settings
 
 - `position`: `0.2` (20%)
