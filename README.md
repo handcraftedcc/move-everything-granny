@@ -94,7 +94,9 @@ Install target:
 
 Restart Move Anything after install.
 
-## Porting Note
+## AI Assistance Disclaimer
 
-For reusable Shadow UI filepath browser integration details, see:
-- `docs/filepath-browser-porting.md`
+This module is part of Move Everything and was developed with AI assistance, including Claude, Codex, and other AI assistants.
+
+All architecture, implementation, and release decisions are reviewed by human maintainers.
+AI-assisted content may still contain errors, so please validate functionality, security, and license compatibility before production use.
