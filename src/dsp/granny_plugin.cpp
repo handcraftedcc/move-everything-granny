@@ -219,6 +219,7 @@ typedef struct {
     char module_dir[512];
     char current_sample_rel[512];
     char current_sample_name[128];
+    char default_sample_path[512];
     char last_error[256];
     int sample_index;
     int wav_count;
@@ -512,6 +513,13 @@ static int has_wav_extension(const char *name) {
             (ext[3] == 'v' || ext[3] == 'V'));
 }
 
+static const char *path_basename(const char *path) {
+    if (!path) return "";
+    const char *slash = strrchr(path, '/');
+    if (!slash) return path;
+    return slash + 1;
+}
+
 static int discover_wavs(grain_instance_t *inst) {
     if (!inst) return 0;
 
@@ -561,11 +569,15 @@ static int discover_wavs(grain_instance_t *inst) {
     return inst->wav_count;
 }
 
-static int apply_sample_file(grain_instance_t *inst, const char *relative_path, const char *display_name) {
-    if (!inst || !relative_path || !relative_path[0]) return -1;
+static int apply_sample_file(grain_instance_t *inst, const char *sample_path, const char *display_name) {
+    if (!inst || !sample_path || !sample_path[0]) return -1;
 
     char resolved[1024];
-    snprintf(resolved, sizeof(resolved), "%s/%s", inst->module_dir, relative_path);
+    if (sample_path[0] == '/') {
+        snprintf(resolved, sizeof(resolved), "%s", sample_path);
+    } else {
+        snprintf(resolved, sizeof(resolved), "%s/%s", inst->module_dir, sample_path);
+    }
 
     sample_buffer_t *loaded = NULL;
     char err[256];
@@ -577,10 +589,19 @@ static int apply_sample_file(grain_instance_t *inst, const char *relative_path, 
     sample_buffer_t *old = inst->active_sample.exchange(loaded, std::memory_order_acq_rel);
     queue_retired_sample(inst, old);
 
-    snprintf(inst->current_sample_rel, sizeof(inst->current_sample_rel), "%s", relative_path);
-    snprintf(inst->current_sample_name, sizeof(inst->current_sample_name), "%s", display_name ? display_name : relative_path);
+    snprintf(inst->current_sample_rel, sizeof(inst->current_sample_rel), "%s", sample_path);
+    snprintf(inst->current_sample_name, sizeof(inst->current_sample_name), "%s",
+             display_name ? display_name : path_basename(sample_path));
     set_error(inst, NULL);
     return 0;
+}
+
+static void clear_loaded_sample(grain_instance_t *inst) {
+    if (!inst) return;
+    sample_buffer_t *old = inst->active_sample.exchange(NULL, std::memory_order_acq_rel);
+    queue_retired_sample(inst, old);
+    inst->current_sample_rel[0] = '\0';
+    inst->current_sample_name[0] = '\0';
 }
 
 static int apply_sample_index(grain_instance_t *inst, int requested_index) {
@@ -595,6 +616,37 @@ static int apply_sample_index(grain_instance_t *inst, int requested_index) {
     }
 
     inst->sample_index = idx;
+    return 0;
+}
+
+static int apply_sample_path(grain_instance_t *inst, const char *sample_path) {
+    if (!inst || !sample_path) {
+        set_error(inst, "Empty sample path");
+        return -1;
+    }
+
+    if (!sample_path[0]) {
+        clear_loaded_sample(inst);
+        set_error(inst, NULL);
+        return 0;
+    }
+
+    const char *name = path_basename(sample_path);
+    if (!has_wav_extension(name)) {
+        set_error(inst, "Selected file must be .wav");
+        return -1;
+    }
+
+    if (apply_sample_file(inst, sample_path, name) != 0) {
+        return -1;
+    }
+
+    for (int i = 0; i < inst->wav_count; i++) {
+        if (strcmp(inst->wav_rel_paths[i], sample_path) == 0) {
+            inst->sample_index = i;
+            break;
+        }
+    }
     return 0;
 }
 
@@ -654,6 +706,20 @@ static int json_get_string(const char *json, const char *key, char *out, int out
     return (*p == '"') ? 0 : -1;
 }
 
+static int json_escape(const char *src, char *dst, int dst_len) {
+    if (!src || !dst || dst_len <= 0) return 0;
+    int o = 0;
+    for (int i = 0; src[i] && o < dst_len - 1; i++) {
+        char c = src[i];
+        if ((c == '\\' || c == '"') && o < dst_len - 2) {
+            dst[o++] = '\\';
+        }
+        dst[o++] = c;
+    }
+    dst[o] = '\0';
+    return o;
+}
+
 static const param_meta_t *find_param(const char *key) {
     for (int i = 0; i < PARAM_COUNT; i++) {
         if (strcmp(key, g_params[i].key) == 0) {
@@ -689,6 +755,7 @@ static void init_default_params(grain_instance_t *inst) {
     inst->wav_count = 0;
     inst->current_sample_rel[0] = '\0';
     inst->current_sample_name[0] = '\0';
+    inst->default_sample_path[0] = '\0';
 }
 
 static void parse_defaults_json(grain_instance_t *inst, const char *json_defaults) {
@@ -713,6 +780,11 @@ static void parse_defaults_json(grain_instance_t *inst, const char *json_default
     float sample_index;
     if (json_get_number(json_defaults, "sample_index", &sample_index) == 0) {
         inst->sample_index = (int)sample_index;
+    }
+
+    char sample_path[512];
+    if (json_get_string(json_defaults, "sample_path", sample_path, sizeof(sample_path)) == 0) {
+        snprintf(inst->default_sample_path, sizeof(inst->default_sample_path), "%s", sample_path);
     }
 }
 
@@ -761,11 +833,9 @@ static void *v2_create_instance(const char *module_dir, const char *json_default
     inst->params = inst->engine.params;
 
     discover_wavs(inst);
-    if (inst->wav_count > 0) {
-        apply_sample_index(inst, inst->sample_index);
-    } else {
-        sample_buffer_t *old = inst->active_sample.exchange(NULL, std::memory_order_acq_rel);
-        queue_retired_sample(inst, old);
+    clear_loaded_sample(inst);
+    if (inst->default_sample_path[0]) {
+        apply_sample_path(inst, inst->default_sample_path);
     }
 
     plugin_log("Granny instance created");
@@ -815,6 +885,10 @@ static void v2_set_param(void *instance, const char *key, const char *val) {
         if (json_get_number(val, "sample_index", &sample_index) == 0) {
             apply_sample_index(inst, (int)sample_index);
         }
+        char sample_path[512];
+        if (json_get_string(val, "sample_path", sample_path, sizeof(sample_path)) == 0) {
+            apply_sample_path(inst, sample_path);
+        }
 
         grn_engine_set_params(&inst->engine, &inst->params);
         inst->params = inst->engine.params;
@@ -828,6 +902,10 @@ static void v2_set_param(void *instance, const char *key, const char *val) {
 
     if (strcmp(key, "sample_index") == 0) {
         apply_sample_index(inst, atoi(val));
+        return;
+    }
+    if (strcmp(key, "sample_path") == 0) {
+        apply_sample_path(inst, val);
         return;
     }
 
@@ -866,6 +944,9 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
     if (strcmp(key, "sample_name") == 0) {
         return snprintf(buf, buf_len, "%s", inst->current_sample_name);
     }
+    if (strcmp(key, "sample_path") == 0) {
+        return snprintf(buf, buf_len, "%s", inst->current_sample_rel);
+    }
 
     if (strcmp(key, "active_grains") == 0) {
         return snprintf(buf, buf_len, "%d", grn_engine_active_grains(&inst->engine));
@@ -900,17 +981,22 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
             }
         }
 
+        char sample_path_json[1024];
+        json_escape(inst->current_sample_rel, sample_path_json, sizeof(sample_path_json));
         offset += snprintf(buf + offset, buf_len - offset,
-                           ",\"sample_index\":%d}", inst->sample_index);
+                           ",\"sample_index\":%d,\"sample_path\":\"%s\"}",
+                           inst->sample_index, sample_path_json);
         return offset;
     }
 
     if (strcmp(key, "chain_params") == 0) {
         int offset = 0;
         offset += snprintf(buf + offset, buf_len - offset, "[");
+        offset += snprintf(buf + offset, buf_len - offset,
+                           "{\"key\":\"sample_path\",\"name\":\"Sample File\",\"type\":\"filepath\",\"root\":\"/data/UserData/UserLibrary/Samples\",\"filter\":\".wav\"}");
 
         for (int i = 0; i < PARAM_COUNT; i++) {
-            if (i > 0) offset += snprintf(buf + offset, buf_len - offset, ",");
+            offset += snprintf(buf + offset, buf_len - offset, ",");
             if (strcmp(g_params[i].key, "size_ms") == 0) {
                 offset += snprintf(buf + offset, buf_len - offset,
                                    "{\"key\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"min\":%g,\"max\":%g,\"step\":0.5}",
@@ -992,8 +1078,6 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
         }
 
         offset += snprintf(buf + offset, buf_len - offset,
-                           ",{\"key\":\"sample_index\",\"name\":\"Sample\",\"type\":\"int\",\"min\":0,\"max\":127}");
-        offset += snprintf(buf + offset, buf_len - offset,
                            ",{\"key\":\"sample_count\",\"name\":\"SampleCount\",\"type\":\"int\",\"min\":0,\"max\":128}");
         offset += snprintf(buf + offset, buf_len - offset,
                            ",{\"key\":\"sample_name\",\"name\":\"SampleName\",\"type\":\"string\"}");
@@ -1010,18 +1094,18 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
             "\"levels\":{"
                 "\"root\":{"
                     "\"name\":\"Granny\","
-                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"scan\",\"freeze\",\"sample_index\"],"
+                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"scan\",\"freeze\",\"quality\"],"
                     "\"params\":["
                         "{\"label\":\"Main\",\"level\":\"main\"},"
-                        "{\"label\":\"Pitch / Voice\",\"level\":\"pitch_voice\"},"
+                        "{\"label\":\"Scan\",\"level\":\"scan_menu\"},"
                         "{\"label\":\"Window / Tone\",\"level\":\"window_tone\"},"
-                        "{\"label\":\"Scan\",\"level\":\"scan_menu\"}"
+                        "{\"label\":\"Pitch / Voice\",\"level\":\"pitch_voice\"}"
                     "]"
                 "},"
                 "\"main\":{"
                     "\"name\":\"Main\","
-                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\",\"sample_index\"],"
-                    "\"params\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\",\"sample_index\"]"
+                    "\"knobs\":[\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\"],"
+                    "\"params\":[\"sample_path\",\"position\",\"size_ms\",\"density\",\"spray\",\"jitter\",\"freeze\"]"
                 "},"
                 "\"pitch_voice\":{"
                     "\"name\":\"Pitch / Voice\","

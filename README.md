@@ -33,6 +33,7 @@
 - `spread` (0..1): random stereo pan spread per grain
 - `quality` (0..2): Eco / Normal / High
 - `sample_index` (int): selects a file from `wavs/` (sorted alphabetically)
+- `sample_path` (filepath): loads a specific `.wav` by path (absolute or module-relative)
 
 Debug/readback params (plugin side):
 - `active_grains`
@@ -52,7 +53,7 @@ wavs/texture.wav
 ```
 
 At startup it scans `wavs/`, sorts filenames alphabetically, and loads `sample_index = 0`.
-Set `sample_index` to switch between these bundled files.
+Set `sample_index` to switch between these bundled files, or set `sample_path` to load a specific file directly.
 
 Supported WAV formats:
 - PCM 8/16/24/32-bit
@@ -83,3 +84,9 @@ Installs to:
 ```
 
 Restart Move Everything after installation.
+
+## File Browser Porting
+
+To add generic `filepath` parameter browser support to Shadow UI in the main Move Anything repo, see:
+
+- `docs/filepath-browser-porting.md`

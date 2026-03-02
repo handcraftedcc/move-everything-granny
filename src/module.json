@@ -30,7 +30,7 @@
     "scan_end_mode": "wrap",
     "spread": 0.2,
     "quality": "normal",
-    "sample_index": 0
+    "sample_path": ""
   },
   "capabilities": {
     "audio_out": true,
@@ -52,13 +52,13 @@
             "jitter",
             "scan",
             "freeze",
-            "sample_index"
+            "quality"
           ],
           "params": [
             { "label": "Main", "level": "main" },
-            { "label": "Pitch / Voice", "level": "pitch_voice" },
+            { "label": "Scan", "level": "scan_menu" },
             { "label": "Window / Tone", "level": "window_tone" },
-            { "label": "Scan", "level": "scan_menu" }
+            { "label": "Pitch / Voice", "level": "pitch_voice" }
           ]
         },
         "main": {
@@ -69,17 +69,16 @@
             "density",
             "spray",
             "jitter",
-            "freeze",
-            "sample_index"
+            "freeze"
           ],
           "params": [
+            "sample_path",
             "position",
             "size_ms",
             "density",
             "spray",
             "jitter",
-            "freeze",
-            "sample_index"
+            "freeze"
           ]
         },
         "pitch_voice": {
@@ -136,6 +135,7 @@
       }
     },
     "chain_params": [
+      { "key": "sample_path", "name": "Sample File", "type": "filepath", "root": "/data/UserData/UserLibrary/Samples", "filter": ".wav", "default": "" },
       { "key": "position", "name": "Position", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01, "default": 0.5 },
       { "key": "size_ms", "name": "Size", "type": "float", "min": 5.0, "max": 500.0, "step": 0.5, "default": 60.0 },
       { "key": "density", "name": "Density", "type": "float", "min": 1.0, "max": 60.0, "step": 0.5, "default": 18.0 },
@@ -143,7 +143,6 @@
       { "key": "jitter", "name": "Jitter", "type": "float", "min": 0.0, "max": 1.0, "step": 0.001, "default": 0.1 },
       { "key": "scan", "name": "Scan", "type": "float", "min": -10.0, "max": 10.0, "step": 0.01, "default": 0.0 },
       { "key": "freeze", "name": "Freeze", "type": "enum", "options": ["off", "on"], "default": "off" },
-      { "key": "sample_index", "name": "Sample", "type": "int", "min": 0, "max_param": "sample_count", "step": 1, "default": 0 },
       { "key": "pitch_semi", "name": "Pitch", "type": "int", "min": -24, "max": 24, "step": 1, "default": 0 },
       { "key": "fine_cents", "name": "Fine", "type": "float", "min": -100.0, "max": 100.0, "step": 1.0, "default": 0.0 },
       { "key": "keytrack", "name": "KeyTrack", "type": "float", "min": 0.0, "max": 1.0, "step": 0.01, "default": 1.0 },
