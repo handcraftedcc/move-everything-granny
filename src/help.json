@@ -89,7 +89,11 @@
         "Win Shape:",
         " curve amount",
         "Quality:",
-        " eco/normal/high",
+        " sets density +",
+        " grain limits",
+        "eco: 20 / 16",
+        "normal: 40 / 32",
+        "high: 60 / 48",
         "Trigger:",
         " per voice/global"
       ]

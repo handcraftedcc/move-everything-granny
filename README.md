@@ -80,7 +80,10 @@ Parameter guide by page:
 
 - `Window`: Grain envelope shape (`hann`, `triangle`, `blackman`).
 - `Win Shape`: Adjusts the active window shape response.
-- `Quality`: Processing quality (`eco`, `normal`, `high`).
+- `Quality`: Performance tier (`eco`, `normal`, `high`) that sets density/grain limits:
+  - `eco`: max density `20`, max `16` active grains per voice
+  - `normal`: max density `40`, max `32` active grains per voice
+  - `high`: max density `60`, max `48` active grains per voice
 - `Trigger`: Grain trigger mode (`per_voice`, `global_cloud`).
 
 ### Pitch / Voice
