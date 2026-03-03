@@ -95,7 +95,7 @@
       ]
     },
     {
-      "title": "ADSR",
+      "title": "ADSR Envelope",
       "lines": [
         "A/D/S/R controls",
         "grain spawn gain.",

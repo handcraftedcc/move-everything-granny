@@ -52,7 +52,7 @@ Top-level pages:
 - `Main`
 - `Scan`
 - `Window / Tone`
-- `ADSR`
+- `ADSR Envelope`
 - `Pitch / Voice`
 
 Main quick knobs:
