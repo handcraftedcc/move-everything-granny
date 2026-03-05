@@ -2,7 +2,7 @@
   "id": "granny-grain",
   "name": "Granny",
   "abbrev": "GRN",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "CPU-bounded granular instrument for Move Everything",
   "author": "move-anything contributors",
   "license": "MIT",
