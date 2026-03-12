@@ -45,6 +45,16 @@ static inline float rand01(uint32_t *state) {
     return (float)(xorshift32(state) & 0x00FFFFFFu) / 16777216.0f;
 }
 
+/* Stable one-pole smoothing coefficient without expf().
+ * Matches 1-exp(-x) shape closely enough for envelope/portamento use
+ * while avoiding newer GLIBC math symbol dependencies. */
+static inline float smooth_coeff_from_samples(float samples, int frames) {
+    if (samples <= 1.0f) return 1.0f;
+    float x = (float)frames / samples;
+    if (x <= 0.0f) return 0.0f;
+    return x / (1.0f + x);
+}
+
 static inline int voice_has_active_grains(const grn_engine_t *engine, int voice_idx) {
     for (int i = 0; i < GRN_MAX_GRAINS_PER_VOICE_HIGH; i++) {
         if (engine->grains[voice_idx][i].active) {
@@ -64,7 +74,7 @@ static inline float amp_env_coeff(float ms, int sample_rate, int frames) {
     if (ms <= 0.0f) return 1.0f;
     float samples = ms * 0.001f * (float)sample_rate;
     if (samples < 1.0f) samples = 1.0f;
-    return 1.0f - expf(-(float)frames / samples);
+    return smooth_coeff_from_samples(samples, frames);
 }
 
 static inline void voice_amp_env_enter_attack(const grn_engine_t *engine, grn_voice_t *voice) {
@@ -250,9 +260,13 @@ void grn_engine_init(grn_engine_t *engine) {
         engine->window_lut[i] = 0.5f - 0.5f * cosf(2.0f * (float)M_PI * t);
     }
 
-    for (int i = 0; i <= 240; i++) {
-        float semi = (float)(i - 120);
-        engine->semitone_ratio_lut[i] = powf(2.0f, semi / 12.0f);
+    const float kSemitoneRatio = 1.0594630943592953f; /* 2^(1/12) */
+    engine->semitone_ratio_lut[120] = 1.0f;
+    for (int i = 121; i <= 240; i++) {
+        engine->semitone_ratio_lut[i] = engine->semitone_ratio_lut[i - 1] * kSemitoneRatio;
+    }
+    for (int i = 119; i >= 0; i--) {
+        engine->semitone_ratio_lut[i] = engine->semitone_ratio_lut[i + 1] / kSemitoneRatio;
     }
 
     grn_params_t defaults;
@@ -622,7 +636,7 @@ static void update_voice_pitch(grn_engine_t *engine, grn_voice_t *voice, int fra
     }
 
     float t_sec = t_ms * 0.001f;
-    float alpha = 1.0f - expf(-(float)frames / (engine->sample_rate * t_sec));
+    float alpha = smooth_coeff_from_samples((float)engine->sample_rate * t_sec, frames);
     voice->pitch_note += (voice->target_note - voice->pitch_note) * alpha;
 
     if (fabsf(voice->target_note - voice->pitch_note) < 0.0001f) {
