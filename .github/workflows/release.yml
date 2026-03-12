@@ -45,8 +45,9 @@ jobs:
           fi
           max_glibc="$(echo "$syms" | sed 's/GLIBC_//' | sort -V | tail -n 1)"
           echo "Max GLIBC symbol: $max_glibc"
-          if [ "$(printf '%s\n' "$max_glibc" "2.17" | sort -V | tail -n 1)" != "2.17" ]; then
-            echo "Incompatible GLIBC symbol version detected: $max_glibc (expected <= 2.17)"
+          # Ableton Move runtime reports GNU libc 2.35.
+          if [ "$(printf '%s\n' "$max_glibc" "2.35" | sort -V | tail -n 1)" != "2.35" ]; then
+            echo "Incompatible GLIBC symbol version detected: $max_glibc (expected <= 2.35)"
             exit 1
           fi
 
