@@ -61,8 +61,14 @@ tar -tzf granny-grain-module.tar.gz
 ## Failure Handling
 
 1. If the workflow fails before release creation:
-Fix on `main`.
-Create a new patch tag (example `v0.1.6`).
+Fix on `main` without changing version.
+Keep the same release version/tag and rerun by recreating the tag:
+```bash
+git tag -d v0.1.5
+git push origin :refs/tags/v0.1.5
+git tag -a v0.1.5 -m "Release v0.1.5"
+git push origin v0.1.5
+```
 
 2. If a bad release is already published:
 Leave old tag/release for traceability.
