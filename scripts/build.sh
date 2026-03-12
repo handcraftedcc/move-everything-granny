@@ -38,7 +38,7 @@ cd "$REPO_ROOT"
 echo "=== Building Granny Grain Module ==="
 echo "Cross prefix: $CROSS_PREFIX"
 
-MODULE_DIR="dist/granny-grain"
+MODULE_DIR="dist/granny"
 TARBALL="dist/granny-grain-module.tar.gz"
 
 mkdir -p build

@@ -27,18 +27,18 @@ jobs:
           chmod +x scripts/build.sh
           CROSS_PREFIX=aarch64-linux-gnu- ./scripts/build.sh
           test -f dist/granny-grain-module.tar.gz
-          test -f dist/granny-grain/dsp.so
+          test -f dist/granny/dsp.so
 
       - name: Verify package contents
         run: |
-          tar -tzf dist/granny-grain-module.tar.gz | grep -q 'granny-grain/module.json'
-          tar -tzf dist/granny-grain-module.tar.gz | grep -q 'granny-grain/dsp.so'
-          tar -tzf dist/granny-grain-module.tar.gz | grep -q 'granny-grain/README.md'
-          tar -tzf dist/granny-grain-module.tar.gz | grep -q 'granny-grain/help.json'
+          tar -tzf dist/granny-grain-module.tar.gz | grep -q 'granny/module.json'
+          tar -tzf dist/granny-grain-module.tar.gz | grep -q 'granny/dsp.so'
+          tar -tzf dist/granny-grain-module.tar.gz | grep -q 'granny/README.md'
+          tar -tzf dist/granny-grain-module.tar.gz | grep -q 'granny/help.json'
 
       - name: Verify GLIBC Compatibility
         run: |
-          syms="$(strings dist/granny-grain/dsp.so | grep -oE 'GLIBC_[0-9]+\.[0-9]+' || true)"
+          syms="$(strings dist/granny/dsp.so | grep -oE 'GLIBC_[0-9]+\.[0-9]+' || true)"
           if [ -z "$syms" ]; then
             echo "No GLIBC symbols found in dsp.so (unexpected)."
             exit 1

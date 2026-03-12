@@ -123,7 +123,7 @@ cd move-anything-granny
 Install target:
 
 ```text
-/data/UserData/move-anything/modules/sound_generators/granny-grain/
+/data/UserData/move-anything/modules/sound_generators/granny/
 ```
 
 Restart Move Anything after install.
