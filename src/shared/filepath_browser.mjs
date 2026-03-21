@@ -1,5 +1,5 @@
 /*
- * Reusable filepath parameter browser helpers for Move Anything Shadow UI.
+ * Reusable filepath parameter browser helpers for Schwung Shadow UI.
  *
  * This file is designed to be copied into move-anything/shared and imported
  * from shadow_ui.js with minimal glue code.

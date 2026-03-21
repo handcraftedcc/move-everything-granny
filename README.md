@@ -1,6 +1,6 @@
-# Move Anything - Granny Module
+# Schwung - Granny Module
 
-Granular sampler module for [Move Anything](https://github.com/charlesvestal/move-anything).
+Granular sampler module for [Schwung](https://github.com/charlesvestal/move-anything).
 
 Granny plays short grains from a WAV file and gives you direct control over position, scan, windowing, and voice behavior.
 
@@ -29,7 +29,7 @@ By default, `sample_path` is empty, so Granny is silent until you select a file.
 
 ## Prerequisites
 
-- [Move Anything](https://github.com/charlesvestal/move-anything) installed on your Ableton Move
+- [Schwung](https://github.com/charlesvestal/move-anything) installed on your Ableton Move
 - WAV files available on device (recommended path below)
 
 ## Requirements
@@ -107,7 +107,7 @@ Parameter guide by page:
 
 ### Module Store (recommended)
 
-Install `Granny` from Move Anything's Module Store.
+Install `Granny` from Schwung's Module Store.
 
 ### Build from Source
 
@@ -123,10 +123,10 @@ cd move-anything-granny
 Install target:
 
 ```text
-/data/UserData/move-anything/modules/sound_generators/granny-grain/
+/data/UserData/schwung/modules/sound_generators/granny-grain/
 ```
 
-Restart Move Anything after install.
+Restart Schwung after install.
 
 ## Current Limitations
 
@@ -135,7 +135,7 @@ Restart Move Anything after install.
 
 ## AI Assistance Disclaimer
 
-This module is part of Move Everything and was developed with AI assistance, including Claude, Codex, and other AI assistants.
+This module is part of Schwung and was developed with AI assistance, including Claude, Codex, and other AI assistants.
 
 All architecture, implementation, and release decisions are reviewed by human maintainers.
 AI-assisted content may still contain errors, so please validate functionality, security, and license compatibility before production use.
