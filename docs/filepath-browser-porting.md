@@ -1,6 +1,6 @@
 # Filepath Parameter Browser Porting Guide
 
-This repo adds a reusable `filepath` parameter model intended for Move Anything Shadow UI.
+This repo adds a reusable `filepath` parameter model intended for Schwung Shadow UI.
 
 ## What Was Added Here
 
@@ -13,11 +13,11 @@ This repo adds a reusable `filepath` parameter model intended for Move Anything 
   - `chain_params` entry with `"type": "filepath"`
   - `root` + `filter`
 
-## Move Anything Port Steps
+## Schwung Port Steps
 
 ## 1. Copy Shared Helper
 
-Copy this file into Move Anything:
+Copy this file into Schwung:
 
 - from: `src/shared/filepath_browser.mjs`
 - to: `src/shared/filepath_browser.mjs` (in `move-anything` repo)
@@ -32,7 +32,7 @@ import {
     refreshFilepathBrowser,
     moveFilepathBrowserSelection,
     activateFilepathBrowserItem
-} from '/data/UserData/move-anything/shared/filepath_browser.mjs';
+} from '/data/UserData/schwung/shared/filepath_browser.mjs';
 ```
 
 ## 3. Add a New View Constant
@@ -115,7 +115,7 @@ Also supported for `filter`:
 
 ## 9. Validate with Granny
 
-After porting to Move Anything:
+After porting to Schwung:
 
 1. Open Granny in Shadow UI hierarchy editor
 2. Select `Sample File`

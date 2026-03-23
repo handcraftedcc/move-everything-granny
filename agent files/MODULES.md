@@ -1,6 +1,6 @@
 # Module Development Guide
 
-Modules are self-contained packages that extend Move Anything with new functionality.
+Modules are self-contained packages that extend Schwung with new functionality.
 
 ## Module Structure
 
@@ -88,9 +88,9 @@ Use `defaults` to pass initial parameters to DSP plugins at load time:
 
 ## Drop-In Modules
 
-Modules are discovered at runtime from `/data/UserData/move-anything/modules`.
+Modules are discovered at runtime from `/data/UserData/schwung/modules`.
 To add a new module, copy a folder with `module.json` (plus `ui.js` and `dsp.so`
-if needed) and either restart Move Anything or call `host_rescan_modules()` in
+if needed) and either restart Schwung or call `host_rescan_modules()` in
 your UI. No host recompile is required for new modules or UI updates.
 
 ## JavaScript UI (ui.js)
@@ -737,7 +737,7 @@ The Signal Chain module allows combining MIDI sources, MIDI effects, sound gener
 
 The CLAP module (separate repo: `move-anything-clap`) hosts arbitrary CLAP audio plugins:
 
-- Place `.clap` plugin files in `/data/UserData/move-anything/modules/clap/plugins/`
+- Place `.clap` plugin files in `/data/UserData/schwung/modules/clap/plugins/`
 - Plugins are discovered at load time
 - Use jog wheel to browse plugins, encoders to control parameters
 - CLAP synths work as sound generators in Signal Chain
@@ -745,7 +745,7 @@ The CLAP module (separate repo: `move-anything-clap`) hosts arbitrary CLAP audio
 
 ### Patch Files
 
-Patches are stored in `/data/UserData/move-anything/patches/` on the device as JSON:
+Patches are stored in `/data/UserData/schwung/patches/` on the device as JSON:
 
 ```json
 {
@@ -843,14 +843,14 @@ Shadow Mode runs custom signal chains alongside stock Ableton Move. Your modules
 
 ### How It Works
 
-Shadow mode loads the same chain module and patches that Move Anything uses standalone. When you install a module via Module Store (or manually copy it to the modules directory), it becomes available to:
+Shadow mode loads the same chain module and patches that Schwung uses standalone. When you install a module via Module Store (or manually copy it to the modules directory), it becomes available to:
 
-1. **Standalone Move Anything** - when launched via the hotkey combo
+1. **Standalone Schwung** - when launched via the hotkey combo
 2. **Shadow Mode** - when toggled while stock Move is running
 
 Both modes read from the same directories:
-- Modules: `/data/UserData/move-anything/modules/`
-- Patches: `/data/UserData/move-anything/patches/`
+- Modules: `/data/UserData/schwung/modules/`
+- Patches: `/data/UserData/schwung/patches/`
 
 ### Making Your Module Shadow-Compatible
 
@@ -871,7 +871,7 @@ Valid `component_type` values for chainable modules:
 
 ### Creating Shadow Chain Patches
 
-Patches are JSON files in `/data/UserData/move-anything/patches/`. To create a patch using your module:
+Patches are JSON files in `/data/UserData/schwung/patches/`. To create a patch using your module:
 
 ```json
 {
@@ -919,7 +919,7 @@ Each shadow slot can load a different chain patch. Slot settings and synth state
 
 ### Testing Shadow Mode
 
-1. Build and install Move Anything: `./scripts/build.sh && ./scripts/install.sh local`
+1. Build and install Schwung: `./scripts/build.sh && ./scripts/install.sh local`
 2. Launch stock Move (or reboot device)
 3. Toggle shadow mode: **Shift + touch Volume + touch Knob 1**
 4. Use jog wheel to select a slot, click to browse patches
@@ -989,7 +989,7 @@ Audio FX modules can define capture rules in their `module.json`:
 
 ### Shadow Mode Configuration
 
-Shadow slot configuration is stored in `/data/UserData/move-anything/shadow_chain_config.json`:
+Shadow slot configuration is stored in `/data/UserData/schwung/shadow_chain_config.json`:
 
 ```json
 {
@@ -1253,7 +1253,7 @@ The Module Store fetches the latest release from the GitHub repo and looks for a
 
 ## Host Updates
 
-The Move Anything host can also be updated via the Module Store. When an update is available, "Update Host" appears at the top of the Module Store category list.
+The Schwung host can also be updated via the Module Store. When an update is available, "Update Host" appears at the top of the Module Store category list.
 
 ### Releasing a Host Update
 
@@ -1276,7 +1276,7 @@ The Move Anything host can also be updated via the Module Store. When an update 
    ```json
    {
      "host": {
-       "name": "Move Anything",
+       "name": "Schwung",
        "github_repo": "charlesvestal/move-anything",
        "asset_name": "move-anything.tar.gz",
        "latest_version": "1.0.1",
@@ -1295,10 +1295,10 @@ The Move Anything host can also be updated via the Module Store. When an update 
 ### How Updates Work
 
 1. Module Store fetches `module-catalog.json` from the main branch
-2. Compares `host.latest_version` to installed version in `/data/UserData/move-anything/host/version.txt`
+2. Compares `host.latest_version` to installed version in `/data/UserData/schwung/host/version.txt`
 3. If different, shows "Update Host" option with version numbers
 4. Update downloads the tarball and extracts over the existing installation
-5. User must restart Move Anything for changes to take effect
+5. User must restart Schwung for changes to take effect
 
 ### Catalog Location
 

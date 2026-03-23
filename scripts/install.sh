@@ -15,14 +15,14 @@ fi
 echo "=== Installing Granny Grain Module ==="
 
 echo "Copying module to Move..."
-ssh ableton@move.local "mkdir -p /data/UserData/move-anything/modules/sound_generators/granny"
-scp -r dist/granny/* ableton@move.local:/data/UserData/move-anything/modules/sound_generators/granny/
+ssh ableton@move.local "mkdir -p /data/UserData/schwung/modules/sound_generators/granny-grain"
+scp -r dist/granny-grain/* ableton@move.local:/data/UserData/schwung/modules/sound_generators/granny-grain/
 
 echo "Setting permissions..."
-ssh ableton@move.local "chmod -R a+rw /data/UserData/move-anything/modules/sound_generators/granny"
+ssh ableton@move.local "chmod -R a+rw /data/UserData/schwung/modules/sound_generators/granny-grain"
 
 echo ""
 echo "=== Install Complete ==="
-echo "Module installed to: /data/UserData/move-anything/modules/sound_generators/granny/"
+echo "Module installed to: /data/UserData/schwung/modules/sound_generators/granny-grain/"
 echo ""
-echo "Restart Move Anything to load the new module."
+echo "Restart Schwung to load the new module."
