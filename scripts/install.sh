@@ -7,8 +7,8 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 cd "$REPO_ROOT"
 
-if [ ! -d "dist/granny-grain" ]; then
-    echo "Error: dist/granny-grain not found. Run ./scripts/build.sh first."
+if [ ! -d "dist/granny" ]; then
+    echo "Error: dist/granny not found. Run ./scripts/build.sh first."
     exit 1
 fi
 

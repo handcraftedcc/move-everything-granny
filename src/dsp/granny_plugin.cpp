@@ -1001,7 +1001,7 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
         int offset = 0;
         offset += snprintf(buf + offset, buf_len - offset, "[");
         offset += snprintf(buf + offset, buf_len - offset,
-                           "{\"key\":\"sample_path\",\"name\":\"Sample File\",\"type\":\"filepath\",\"root\":\"/data/UserData/UserLibrary/Samples\",\"filter\":\".wav\"}");
+                           "{\"key\":\"sample_path\",\"name\":\"Sample File\",\"type\":\"filepath\",\"root\":\"/data/UserData/UserLibrary/Samples\",\"filter\":\".wav\",\"live_preview\":true}");
 
         for (int i = 0; i < PARAM_COUNT; i++) {
             offset += snprintf(buf + offset, buf_len - offset, ",");
