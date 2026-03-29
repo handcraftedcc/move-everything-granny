@@ -1005,7 +1005,10 @@ static int v2_get_param(void *instance, const char *key, char *buf, int buf_len)
 
         for (int i = 0; i < PARAM_COUNT; i++) {
             offset += snprintf(buf + offset, buf_len - offset, ",");
-            if (strcmp(g_params[i].key, "size_ms") == 0) {
+            if (strcmp(g_params[i].key, "position") == 0) {
+                offset += snprintf(buf + offset, buf_len - offset,
+                                   "{\"key\":\"position\",\"name\":\"Position\",\"type\":\"wav_position\",\"display_unit\":\"percent\",\"mode\":\"position\",\"filepath_param\":\"sample_path\",\"min\":0,\"max\":1,\"step\":0.01}");
+            } else if (strcmp(g_params[i].key, "size_ms") == 0) {
                 offset += snprintf(buf + offset, buf_len - offset,
                                    "{\"key\":\"%s\",\"name\":\"%s\",\"type\":\"%s\",\"min\":%g,\"max\":%g,\"step\":0.5}",
                                    g_params[i].key,
