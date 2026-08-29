@@ -104,7 +104,9 @@
             "polyphony",
             "portamento_ms",
             "spread"
-          ]
+          ,
+            { "key": "play_mode", "short_name": "Play" },
+            { "key": "portamento_ms", "short_name": "Porta" }]
         },
         "window_tone": {
           "name": "Window / Tone",
@@ -149,7 +151,9 @@
             "scan_enable",
             "scan",
             "scan_end_mode"
-          ]
+          ,
+            { "key": "scan_enable", "short_name": "Enable" },
+            { "key": "scan_end_mode", "short_name": "End" }]
         }
       }
     },
